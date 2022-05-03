@@ -1,0 +1,539 @@
+## Version: 21.4.0.24526
+## Documentation for this chart is available here
+
+global:
+  ## Docker repository containing the exstream images
+  dockerRepository: registry.opentext.com
+
+  ## An array of image pull secrets 
+  imagePullSecrets:
+    - gorka.gutierrez.tessi.es
+
+  ## Optional - repository of dependencies such as postgres 
+  exstreamDependencyRepository: ""
+
+  batch:
+    enabled: true
+    version: 21.4.0.1721
+
+  design:
+    enabled: true
+    version: 21.4.0.11607
+
+  empower:
+    enabled: true
+    version: 21.4.0.10344
+
+  ondemand:
+    enabled: true
+    version: 21.4.0.1721
+
+  orchestration:
+    enabled: true
+    version: 21.4.0.2428
+    customPlugins:
+      enabled: false
+      path: "plugins"
+
+  eep: ##cxi integration or assured delivery
+    version: 21.4.0.363
+    ##This field is to clear the data before the specified days from eep database
+    #value should be provided in number of days
+    dataPeristencePeriod: 7
+
+  assuredDelivery:
+    enabled: true
+    schedule:
+      report: "*/15 * * * *"
+    consolidation:
+      ## This field is to configure wait period for a final external event in OT notifications channel report
+      ## After timeout, last received event for a flow-step will be shared with Orchestration 
+      ## Value must be provided in seconds
+      timeout: 7200
+
+  ei:
+    enabled: true
+    version: 21.4.0.499
+
+  rationalization:
+    enabled: true
+    version: 21.4.0.698
+
+  otds:
+    enabled: true
+    # The OTDS URL that ExstreamCE services should access directly.
+    # If not specified, this will default to the URL specified in externalFrontEnd.
+    externalBackEnd: http://otdsws.chemaproject.svc
+    # The OTDS URL that ExstreamCE services should pass to clients, such as on login redirects.
+    externalFrontEnd: http://otdsws-chemaproject.appsos.mad.imdea.com/
+    oauth2:
+      clientId: ExstreamSystem
+      clientSecret: 17E0ZHmm1abl6ZFeA3dTs1peVIE18m7k
+
+  ingress:
+    #hostname: exstreamdemo.opentext.net
+    hostname: exstr-chemaproject.appsos.mad.imdea.com
+    hostport: 80
+    # Set a root path to the url
+    # For example "http://hostname/myContext/..."
+    context: exstrce214
+    annotations:
+      # Trigger annotations for the given ingress type.
+      # Supported values: none, nginx, openshiftRoute
+      type: openshiftRoute
+
+  ## Enable integration with prometheus
+  #  prometheus:
+  #    secretName: prometheus-auth
+  #    secretKey: password
+  ## Enable tls on the ingress
+  tls:
+    enabled: false
+    crt: ""
+    key: ""
+
+  frontEnd:
+    # Set the protocol for URLs returned by ExstreamCE to ExstreamCE services. Can be http, https, or auto (which will set the value based on tls.enabled).
+    protocol: auto
+
+  ## Trust store stored by all services
+  trust:
+    custom:
+      enabled: false
+      source: ""
+      password: changeit
+
+  ## For test purposes provision a database as part of the installation
+  exstreamdb:
+    dbType: POSTGRES
+    svcName: exstreamdb-svc
+    svcPort: 8888
+
+  ## Design service database connection information
+  dasdb:
+    schema:
+      prefix: ""
+
+      ## Should the design service be responsible for managing the database schema?
+      autoManage:
+        enabled: true
+        username: postgres
+        password: Exstream1!
+
+    ## Connection information to the design database
+    externalDb:
+      enabled: false
+      # The type of database.  Possible values: SQLSERVER | ORACLE | POSTGRES
+      dbType: POSTGRES
+      username: username
+      password: password
+      url: jdbc:postgresql://localhost:5432/exstream
+      #url: "jdbc:sqlserver://localhost:1433;databaseName=exstream"
+      #url: "jdbc:oracle:thin:@//localhost:1521/XE"
+      ## System tenant schema
+      schema: schemaName
+
+      # usernameSuffix will be concatenated to the end of all usernames. For example Azure Postgres 
+      # needs @hostname applied to the end of the username and in this case set usernameSuffix to @hostname.
+      usernameSuffix: null
+
+  ## Orchestration service database connection information
+  orcdb:
+    schema:
+      prefix: ""
+
+      ## Should the orchestration service be responsible for managing the database schema?
+      autoManage:
+        enabled: true
+        username: postgres
+        password: Exstream1!
+
+    ## Connection information to the orchestration database
+    externalDb:
+      enabled: false
+      # The type of database.  Possible values: SQLSERVER | ORACLE | POSTGRES
+      dbType: POSTGRES
+      username: username
+      password: password
+      url: jdbc:postgresql://localhost:5432/exstream
+      #url: "jdbc:sqlserver://localhost:1433;databaseName=exstream"
+      #url: "jdbc:oracle:thin:@//localhost:1521/XE"
+      ## System tenant schema
+      schema: schemaName
+
+      # usernameSuffix will be concatenated to the end of all usernames. For example Azure Postgres 
+      # needs @hostname applied to the end of the username and in this case set usernameSuffix to @hostname.
+      usernameSuffix: null
+
+  ## Empower service database connection information
+  empowerdb:
+    schema:
+      prefix: ""
+      ## Should the empower service be responsible for managing the database schema?
+      autoManage:
+        enabled: true
+        username: postgres
+        password: Exstream1!
+      shared:
+        name: shared_schema
+        username: shared_user
+        password: Exstream1!
+      system:
+        name: system_schema
+        username: system_user
+        password: Exstream1!
+    externalDb:
+      enabled: false
+      # The type of database.  Possible values: SQLSERVER | ORACLE | POSTGRES
+      dbType: POSTGRES
+      url: jdbc:postgresql://localhost:5432/exstream
+      #url: "jdbc:sqlserver://localhost:1433;databaseName=exstream"
+      #url: "jdbc:oracle:thin:@//localhost:1521/XE"
+      # usernameSuffix will be concatenated to the end of all usernames. For example Azure Postgres 
+      # needs @hostname applied to the end of the username and in this case set usernameSuffix to @hostname.
+      usernameSuffix: null
+
+  ## Rationalization service database connection information
+  rationalizationdb:
+    schema:
+      prefix: ""
+
+      ## Should the Rationalization service be responsible for managing the database schema?
+      autoManage:
+        enabled: true
+        username: postgres
+        password: Exstream1!
+
+    ## Connection information to the Rationalization database
+    externalDb:
+      enabled: false
+      # The type of database.  Possible values: SQLSERVER | ORACLE | POSTGRES
+      dbType: POSTGRES
+      username: username
+      password: password
+      url: jdbc:postgresql://localhost:5432/exstream
+      #url: "jdbc:sqlserver://localhost:1433;databaseName=exstream"
+      #url: "jdbc:oracle:thin:@//localhost:1521/XE"
+      ## System tenant schema
+      schema: schemaName
+
+      # usernameSuffix will be concatenated to the end of all usernames. For example Azure Postgres 
+      # needs @hostname applied to the end of the username and in this case set usernameSuffix to @hostname.
+      usernameSuffix: null
+
+  ## Experience Insights (EI) service database connection information
+  eidb:
+    schema:
+      prefix: ""
+
+      ## Should the EI service be responsible for managing the database schema?
+      autoManage:
+        enabled: true
+        username: postgres
+        password: Exstream1!
+
+    ## Connection information to the EI database
+    externalDb:
+      enabled: false
+      # The type of database.  Possible values: SQLSERVER | ORACLE | POSTGRES
+      dbType: POSTGRES
+      username: username
+      password: password
+      url: jdbc:postgresql://localhost:5432/exstream
+      #url: "jdbc:sqlserver://localhost:1433;databaseName=exstream"
+      #url: "jdbc:oracle:thin:@//localhost:1521/XE"
+      ## System tenant schema
+      schema: schemaName
+
+      # usernameSuffix will be concatenated to the end of all usernames. For example Azure Postgres 
+      # needs @hostname applied to the end of the username and in this case set usernameSuffix to @hostname.
+      usernameSuffix: null
+
+  ## External events puller database connection information
+  eepdb:
+    schema:
+      prefix: ""
+
+      ## Should the EEP service be responsible for managing the database schema?
+      autoManage:
+        enabled: true
+        username: postgres
+        password: Exstream1!
+
+    ## Connection information to the EEP database
+    externalDb:
+      enabled: false
+      # The type of database.  Possible values: SQLSERVER | ORACLE | POSTGRES
+      dbType: POSTGRES
+      username: username
+      password: password
+      url: jdbc:postgresql://localhost:5432/exstream
+      #url: "jdbc:sqlserver://localhost:1433;databaseName=exstream"
+      #url: "jdbc:oracle:thin:@//localhost:1521/XE"
+      ## System tenant schema
+      schema: schemaName
+
+      # usernameSuffix will be concatenated to the end of all usernames. For example Azure Postgres 
+      # needs @hostname applied to the end of the username and in this case set usernameSuffix to @hostname.
+      usernameSuffix: null
+
+  ## Storage for the batch and orchestration services
+  storage:
+    shared:
+      className: nfs
+      userId: 5001
+      groupId: 5001
+      fsGroup: null
+      # example: umask: "0022"
+      umask: null
+      size: 10Gi
+      local:
+        enabled: false
+        path: "/c/ExstreamOrcRoot"
+
+  ## RabbitMQ queue information
+  rabbitmq:
+    username: exstreamRabbitUser
+    password: Ex20Rabb!t
+    # Enable the rabbit management ui 
+    #managementUsername: exstreamRabbitAdmin
+    #managementPassword: Exstream1!
+    #includeManagement: true
+
+  ot2:
+    enabled: false
+    ets:
+      backend:
+        url: http://xx.xx.xx.xx:8080
+
+# Sub charts
+batch:
+  replicaCount: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  schedule:
+    cleanup: "20 * * * *" #expects a cron like */60 * * * *
+    maxAgeMillis: "604800000" # Max age, in millis, before a batch job folder is cleaned. Defaults to 1 week.
+  extraEnvironmentVars: {}
+  #    sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #    - envName: SAMPLE_ENV_NAME
+  #      secretName: sample-secret-name
+  #      secretKey: sample-secret-key
+  # Add extra properties to the batch deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the batch deployment
+  extraDeploymentProperties: {}
+
+design:
+  replicaCount: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  # Set allowed origins for this service.  Example: http://127.0.0.1:3000,http://mycompany.domain.net:4000
+  allowedOrigins: "*"
+  local: false
+  extraEnvironmentVars: {}
+  #    sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #    - envName: SAMPLE_ENV_NAME
+  #      secretName: sample-secret-name
+  #      secretKey: sample-secret-key
+  # Add extra properties to the design deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the design deployment
+  extraDeploymentProperties: {}
+  solr:
+    zkHosts: ""
+    username: ""
+    password: ""
+
+empower:
+  replicaCount: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  # Set allowed origins for this service.  Example: http://127.0.0.1:3000,http://mycompany.domain.net:4000
+  allowedOrigins: "*"
+  extraEnvironmentVars: {}
+  #    sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #    - envName: SAMPLE_ENV_NAME
+  #      secretName: sample-secret-name
+  #      secretKey: sample-secret-key
+  # Add extra properties to the empower deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the empower deployment
+  extraDeploymentProperties: {}
+
+  # Turn audit logs on or off
+  audit:
+    enabled: true
+  # DB Connection pool settings per tenant
+  hikari:
+    # Min number of connections to keep in the pool when the app is not being used
+    minIdle: 10
+    # Largest number of connections to keep in the pool at any one time.  Once max is hit, a client must wait on one to be returned to the pool
+    maxPool: 10
+    # Lifetime of each connection if it isn't terminated before this (in ms)
+    maxLifetime: 600000
+    # Time a connection has not been used before the pool consideres it idle and considers closing it (in ms)
+    idleTimeout: 300000
+    # Time to wait while getting a connection from the pool (in ms)
+    connTimeout: 30000
+
+  spring:
+    # When enabled=false, traces log to the console. Comment or set to true to send to zipkin.
+    zipkinEnabled: false
+    zipkinBaseUrl: http://zipkin:9411/
+    # Set to 1.0 to sample and send all calls to zipkin. Set to 0.0 to send none.
+    sleuthSamplerProbability: 0.0
+
+ondemand:
+  replicaCount: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  extraEnvironmentVars: {}
+  #    sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #    - envName: SAMPLE_ENV_NAME
+  #      secretName: sample-secret-name
+  #      secretKey: sample-secret-key
+  # Add extra properties to the ondemand deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the ondemand deployment
+  extraDeploymentProperties: {}
+
+orchestration:
+  replicaCount: 1
+  gracefulTerminationTimeout: 28800
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  # Set allowed origins for this service.  Example: http://127.0.0.1:3000,http://mycompany.domain.net:4000
+  allowedOrigins: "*"
+  extraEnvironmentVars: {}
+  #    sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #    - envName: SAMPLE_ENV_NAME
+  #      secretName: sample-secret-name
+  #      secretKey: sample-secret-key
+  # Add extra properties to the orchestration deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the orchestration deployment
+  extraDeploymentProperties: {}
+  schedule:
+    cleanup: "*/60 * * * *"
+  ## (AWS) SQS information
+  sqs:
+    enabled: false
+    keyid: ""
+    secretkey: ""
+    # AWS region, for example: eu-central-1
+    region: ""
+    queueName: ""
+
+  ## Azure queue information
+  azure:
+    enabled: false
+    # The storage account for the queue
+    storageaccount: ""
+    # The access key for the queue
+    accesskey: ""
+    # The name of the queue
+    queue: ""
+
+  ## (GCP) GCS information
+  gcs:
+    enabled: false
+    secretkey: ""
+    projectid: ""
+    subscriptionid: ""
+
+ei:
+  replicaCount:
+    api: 1
+    cme: 1
+    ci: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  # Set allowed origins for this service. Example: http://127.0.0.1:3000,http://mycompany.domain.net:4000
+  allowedOrigins: "*"
+  schedule:
+    event: "*/10 * * * *"
+    cleanup: "*/50 * * * *"
+  extraEnvironmentVars: {}
+  #  sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #  - envName: SAMPLE_ENV_NAME
+  #    secretName: sample-secret-name
+  #    secretKey: sample-secret-key 
+  # Add extra properties to the config-api deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the config-api deployment
+  extraDeploymentProperties: {}
+
+rationalization:
+  replicaCount: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  # Set allowed origins for this service.  Example: http://127.0.0.1:3000,http://mycompany.domain.net:4000
+  allowedOrigins: "*"
+  extraEnvironmentVars: {}
+  #  sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #  - envName: SAMPLE_ENV_NAME
+  #    secretName: sample-secret-name
+  #    secretKey: sample-secret-key 
+  # Add extra properties to the rationalization deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the rationalization deployment
+  extraDeploymentProperties: {}
+
+eep:
+  replicaCount: 1
+  # Add prometheus.io/scrape annotation to the service
+  metrics: false
+  # Set allowed origins for this service. Example: http://127.0.0.1:3000,http://mycompany.domain.net:4000
+  allowedOrigins: "*"
+  schedule:
+    event: "*/15 * * * *" #expects a cron like */10 * * * *
+    cleanup: "*/60 * * * *" #expects a cron like */50 * * * *
+  extraEnvironmentVars: {}
+  #  sampleVariable: value
+  extraSecretEnvironmentVars: []
+  #  - envName: SAMPLE_ENV_NAME
+  #    secretName: sample-secret-name
+  #    secretKey: sample-secret-key 
+  # Add extra properties to the EEP deployment container
+  extraContainerProperties: {}
+  # Add extra properties to the EEP deployment
+  extraDeploymentProperties: {}
+
+rabbitmq-ha:
+  replicaCount: 1
+  image:
+    tag: 3.8.26-alpine
+  # Set the memory high watermark
+  #rabbitmqMemoryHighWatermark: 1024MB
+## Upload a default engine as part of the install
+upload-included-engine:
+  version: 21.4.0.1721
+  extraEnvironmentVars: {}
+  #    sampleVariable: value
+  extraSecretEnvironmentVars: []
+#    - envName: SAMPLE_ENV_NAME
+#      secretName: sample-secret-name
+#      secretKey: sample-secret-key
+## Provide a key to encrypt secret information such as db credentials
+encryption:
+  ## Which key should be used to encrypt
+  defaultKey: key1
+  ## Available keys
+  keys:
+    key1: 12haqUHCcL/EJPpkzz5YPNub/q/MGS46TbdxFCmIWT0=
+
+##########################
+bootstrap:
+  enabled: true
+  activeDeadlineSeconds: 360
+  resources:
+    bootstrapJob: {}
+  addAdditionalTestUsers: false
